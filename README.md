@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Code challenge: Calculate number of days between to dates
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
