@@ -1,7 +1,7 @@
 // internals
 import { mapDateToObject } from './mapDate.helper';
 import { getExpectedDaysInMonth } from './getExpectedDaysInMonth.helper';
-import { isInvalid, isValid } from '../constants';
+import { firstGregorianCalendarDay, gregorianCalendarIntroductionDate, isInvalid, isValid } from '../constants';
 
 const validRanges = {
     year: {
@@ -20,8 +20,10 @@ const validRanges = {
 };
 
 /**
- * Returns whether a given date string is
- * correctly formatted or not.
+ * Determines whether a given date string is usable or not.
+ * This includes it meeting a number of criteria from observing
+ * the correct pattern to falling inside the allowed range to be
+ * considered a valid combination of year, month and day.
  *
  * @param {string} date
  * @returns {boolean}
@@ -49,6 +51,20 @@ export const isDateValid = (date) => {
     const isDayValid = validateValue(day, 'Day', [month, year]);
     if (!~isDayValid.valid) {
         return isDayValid;
+    }
+
+    // Check for special cases, like the introduction of the Gregorian calendar
+    if (
+        parseInt(year, 10) === gregorianCalendarIntroductionDate[0] &&
+        parseInt(month, 10) === gregorianCalendarIntroductionDate[1] &&
+        parseInt(day, 10) > gregorianCalendarIntroductionDate[2] &&
+        parseInt(day, 10) < firstGregorianCalendarDay[2]
+    ) {
+        return {
+            valid: false,
+            msg: `Dates between the ${gregorianCalendarIntroductionDate[2]}th and ${firstGregorianCalendarDay[2]}th of October ${firstGregorianCalendarDay[0]} ` +
+                    'were dropped when the Gregorian calendar was introduced and cannot be used'
+        }
     }
 
     return { valid: isValid };

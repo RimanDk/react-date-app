@@ -1,4 +1,5 @@
 // internals
+import { gregorianCalendarIntroductionDate } from "../constants";
 import {
     calculateDaysAcrossMonthsLoop,
     calculateDaysAcrossMonthsRecursively
@@ -26,18 +27,20 @@ export const calculateDaysAcrossYearsLoop = ({ from, to }) => {
     for (let i = from.year; i <= to.year; i++) {
         if (i === to.year) {
             days += calculateDaysAcrossMonthsLoop({
-                from: { year: from.year, month: 1, day: 1 },
+                from: { year: to.year, month: 1, day: 1 },
                 to,
-                month: from.month,
             });
         } else if (i === from.year) {
             days += calculateDaysAcrossMonthsLoop({
                 from,
                 to: { year: to.year, month: 12 },
-                month: from.month,
             });
         } else {
-            days += isLeapYear(i) ? 366 : 365;
+            days += i === gregorianCalendarIntroductionDate[0]
+                ? 355
+                : isLeapYear(i)
+                ? 366
+                : 365;
         }
     }
 
@@ -61,12 +64,12 @@ export const calculateDaysAcrossYearsLoop = ({ from, to }) => {
  * @param {number} [days=0]
  * @returns {number}
  */
-export const calculateDaysAcrossYearsRecursively = ({from, to, year, days = 0}) => {
+export const calculateDaysAcrossYearsRecursively = ({ from, to, year, days = 0 }) => {
     if (year === to.year) {
         return days + calculateDaysAcrossMonthsRecursively({
-            from: {year: from.year, month: 1, day: 1},
+            from: { year: to.year, month: 1, day: 1 },
             to,
-            month: from.month
+            month: 1
         });
     } else if (year === from.year) {
         return calculateDaysAcrossYearsRecursively({
@@ -84,6 +87,10 @@ export const calculateDaysAcrossYearsRecursively = ({from, to, year, days = 0}) 
         from,
         to,
         year: year + 1,
-        days: days += isLeapYear(year) ? 366 : 365,
+        days: days + (year === gregorianCalendarIntroductionDate[0]
+            ? 355
+            : isLeapYear(year)
+            ? 366
+            : 365),
     });
 };

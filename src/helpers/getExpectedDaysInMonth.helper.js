@@ -1,5 +1,5 @@
 // internals
-import { daysInMonths } from "../constants";
+import { daysInMonths, gregorianCalendarIntroductionDate } from "../constants";
 import { isLeapYear } from "./isLeapYear.helper";
 
 /**
@@ -12,6 +12,12 @@ import { isLeapYear } from "./isLeapYear.helper";
  * @returns {number}
  */
 export const getExpectedDaysInMonth = (month, year) => {
+    if (
+        year === gregorianCalendarIntroductionDate[0] &&
+        month === gregorianCalendarIntroductionDate[1]
+    ) {
+        return daysInMonths[9] - 10;
+    }
     if (month === 2) {
         return daysInMonths[1][isLeapYear(year) ? 1 : 0];
     }

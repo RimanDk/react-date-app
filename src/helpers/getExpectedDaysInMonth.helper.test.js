@@ -1,3 +1,4 @@
+import { gregorianCalendarIntroductionDate } from "../constants";
 import { getExpectedDaysInMonth } from "./getExpectedDaysInMonth.helper";
 
 describe('getExpectedDaysInMonth', () => {
@@ -15,5 +16,12 @@ describe('getExpectedDaysInMonth', () => {
 
     it('should return 29 for a leap year February', () => {
         expect(getExpectedDaysInMonth(2, 2020)).toBe(29);
+    });
+
+    it('should return 21 for October 1582', () => {
+        expect(getExpectedDaysInMonth(
+            gregorianCalendarIntroductionDate[1],
+            gregorianCalendarIntroductionDate[0]
+        )).toBe(21);
     });
 });

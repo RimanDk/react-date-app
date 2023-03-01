@@ -1,7 +1,12 @@
 // internals
-import { isValid, isInvalid } from '../constants'
+import { isValid, isInvalid, gregorianCalendarIntroductionDate } from '../constants'
 import { getExpectedDaysInMonth } from "./getExpectedDaysInMonth.helper";
 import { isDateValid } from "./isDateValid.helper";
+
+const getRange = (max) =>
+    new Array(max)
+        .fill('')
+        .map((_, i) => i + 1);
 
 describe('isDateValid', () => {
     describe('data type', () => {
@@ -58,11 +63,6 @@ describe('isDateValid', () => {
     });
 
     describe('component-specific-validation', () => {
-        const getRange = (max) =>
-            new Array(max)
-                .fill('')
-                .map((_, i) => i + 1);
-
         describe('year', () => {
             test.each([-46, Number.MAX_SAFE_INTEGER + 1])(
                 'should not accept years before -45 nor after MAX_SAFE_INTEGER', (year) => {
@@ -110,6 +110,20 @@ describe('isDateValid', () => {
                     getRange(getExpectedDaysInMonth(month, 2023)).forEach((day) => {
                         expect(isDateValid(`2023-${month}-${day}`)).toEqual({ valid: isValid });
                     });
+            });
+        });
+    });
+
+    describe('special cases', () => {
+        describe('introduction of Gregorian calendar', () => {
+            test.each(getRange(10).map((entry) =>
+                `${gregorianCalendarIntroductionDate[0]}-${gregorianCalendarIntroductionDate[1]}-${entry + 4}`
+            ))('should not accept dates falling between the 4th and the 15th of feb 1587', (date) => {
+                expect(isDateValid(date)).toEqual({
+                    valid: false,
+                    msg: 'Dates between the 4th and 15th of October 1582 '+
+                        'were dropped when the Gregorian calendar was introduced and cannot be used'
+                });
             });
         });
     });

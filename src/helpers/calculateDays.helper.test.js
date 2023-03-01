@@ -1,3 +1,4 @@
+import { firstGregorianCalendarDay, gregorianCalendarIntroductionDate } from "../constants";
 import { calculateDays } from "./calculateDays.helper";
 
 describe('calculateDays', () => {
@@ -33,6 +34,60 @@ describe('calculateDays', () => {
     describe('given B.C. dates to work with', () => {
         test.each([true, false])('should still work as long as the dates are within the Julian calendar', (simple) => {
             expect(calculateDays('-45-01-01', '30-01-01', simple)).toBe(27394);
+        });
+    });
+
+    describe('given the passage from Julian to Gregorian calendars is covered in the date range', () => {
+        test.each([true, false])('should account for the 10 missing days', (simple) => {
+        // it('should account for the 10 missing days', (simple) => {
+            // Check calculation for same month
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0]}-${gregorianCalendarIntroductionDate[1]}-01`,
+                `${firstGregorianCalendarDay[0]}-${firstGregorianCalendarDay[1]}-31`,
+                simple
+            )).toBe(20); // 30 days (31 excluding last) minus 10 removed days
+
+            // Check calculatin starting at previous month and ending in crucial month
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0]}-${gregorianCalendarIntroductionDate[1] - 1}-01`,
+                `${firstGregorianCalendarDay[0]}-${firstGregorianCalendarDay[1]}-31`,
+                simple
+            )).toBe(50); // 30 days (sep) plus 30 days (31 excluding last minus 10 removed days)
+
+            // Check calculation starting at crucial month and ending in the month after
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0]}-${gregorianCalendarIntroductionDate[1]}-01`,
+                `${firstGregorianCalendarDay[0]}-${firstGregorianCalendarDay[1] + 1}-30`,
+                simple
+            )).toBe(40); // 21 days (31 minus 10 removed days) plus 29 (nov) (30 excluding last)
+
+            // Check calculation starting the month before crucial month and ending the month after crucial
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0]}-${gregorianCalendarIntroductionDate[1] - 1}-01`,
+                `${firstGregorianCalendarDay[0]}-${firstGregorianCalendarDay[1] + 1}-30`,
+                simple
+            )).toBe(80); // 30 days (sep) plus 21 days (31 minus 10 removed days) plus 29 days (nov) (30 excluding last)
+
+            // Check calculation starting the year prior to crucial and ending in crucial
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0] - 1}-01-01`,
+                `${gregorianCalendarIntroductionDate[0]}-12-31`,
+                simple
+            )).toBe((365+354));
+
+            // Check calculation starting in crucial year and ending in the year after crucial
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0]}-01-01`,
+                `${gregorianCalendarIntroductionDate[0] + 1}-12-31`,
+                simple
+            )).toBe((355+364));
+
+            // Check calculation spanning across crucial year
+            expect(calculateDays(
+                `${gregorianCalendarIntroductionDate[0] - 1}-01-01`,
+                `${gregorianCalendarIntroductionDate[0] + 1}-12-31`,
+                simple
+            )).toBe((365+355+364));
         });
     });
 });

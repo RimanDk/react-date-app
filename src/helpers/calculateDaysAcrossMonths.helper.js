@@ -1,4 +1,9 @@
 // internals
+import {
+    daysInMonths,
+    firstGregorianCalendarDay,
+    gregorianCalendarIntroductionDate
+} from "../constants";
 import { getExpectedDaysInMonth } from "./getExpectedDaysInMonth.helper";
 
 /**
@@ -11,10 +16,17 @@ import { getExpectedDaysInMonth } from "./getExpectedDaysInMonth.helper";
  *
  * @param {number} [endDay]
  * @param {number} expectedDaysInMonth
+ * @param {number} year
  * @returns {number}
  */
-const calculateDaysFromFirstToGiven = (endDay, expectedDaysInMonth) =>
-    endDay ? endDay - 1 : expectedDaysInMonth;
+const calculateDaysFromFirstToGiven = (endDay, expectedDaysInMonth, year) => {
+    if (year === gregorianCalendarIntroductionDate[0] && expectedDaysInMonth === (daysInMonths[9] - 10)) {
+        return endDay <= gregorianCalendarIntroductionDate[2]
+            ? endDay - 1
+            : endDay - 10 - 1;
+    }
+    return endDay ? endDay - 1 : expectedDaysInMonth;
+};
 
 /**
  * Returns the amount of days from the starting day to the end of the
@@ -22,10 +34,17 @@ const calculateDaysFromFirstToGiven = (endDay, expectedDaysInMonth) =>
  *
  * @param {number} startDay
  * @param {number} expectedDaysInMonth
+ * @param {number} year
  * @returns {number}
  */
-const calculateDaysFromGivenToLastOfMonth = (startDay, expectedDaysInMonth) =>
-    expectedDaysInMonth - startDay + 1;
+const calculateDaysFromGivenToLastOfMonth = (startDay, expectedDaysInMonth, year) => {
+    if (year === gregorianCalendarIntroductionDate[0] && expectedDaysInMonth === (daysInMonths[9] - 10)) {
+        return startDay >= firstGregorianCalendarDay[2]
+            ? expectedDaysInMonth - startDay + 1
+            : expectedDaysInMonth - 10 - startDay + 1;
+    }
+    return expectedDaysInMonth - startDay + 1;
+};
 
 /**
  * Simple, maintenance-friendly loop algorithm for calculating days
@@ -49,9 +68,9 @@ export const calculateDaysAcrossMonthsLoop = ({ from, to }) => {
         const expectedDaysInMonth = getExpectedDaysInMonth(i, from.year);
 
         if (i === to.month) {
-            days += calculateDaysFromFirstToGiven(to.day, expectedDaysInMonth);
+            days += calculateDaysFromFirstToGiven(to.day, expectedDaysInMonth, to.year);
         } else if (i === from.month) {
-            days += calculateDaysFromGivenToLastOfMonth(from.day, expectedDaysInMonth);
+            days += calculateDaysFromGivenToLastOfMonth(from.day, expectedDaysInMonth, from.year);
         } else {
             days += expectedDaysInMonth;
         }
@@ -81,13 +100,13 @@ export const calculateDaysAcrossMonthsRecursively = ({ from, to, month, days = 0
     const expectedDaysInMonth = getExpectedDaysInMonth(month, from.year);
 
     if (month === to.month) {
-        return days += calculateDaysFromFirstToGiven(to.day, expectedDaysInMonth);
+        return days += calculateDaysFromFirstToGiven(to.day, expectedDaysInMonth, to.year);
     } else if (month === from.month) {
         return calculateDaysAcrossMonthsRecursively({
             from,
             to,
             month: month + 1,
-            days: days + calculateDaysFromGivenToLastOfMonth(from.day, expectedDaysInMonth),
+            days: days + calculateDaysFromGivenToLastOfMonth(from.day, expectedDaysInMonth, from.year),
         });
     }
     return calculateDaysAcrossMonthsRecursively({

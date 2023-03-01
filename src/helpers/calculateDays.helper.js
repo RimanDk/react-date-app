@@ -1,5 +1,5 @@
 // internals
-import { useSimpleComputation } from "../constants";
+import { firstGregorianCalendarDay, gregorianCalendarIntroductionDate, useSimpleComputation } from "../constants";
 import {
     calculateDaysAcrossMonthsLoop,
     calculateDaysAcrossMonthsRecursively
@@ -23,9 +23,16 @@ export const calculateDays = (fromStr, toStr, simple = useSimpleComputation) => 
 
     if (from.year === to.year) {
         if (from.month === to.month) {
-            return from.day > to.day
-                ? from.day - to.day
-                : to.day - from.day;
+            const [min, max] = from.day > to.day ? [to.day, from.day] : [from.day, to.day];
+            if (
+                from.year === gregorianCalendarIntroductionDate[0] &&
+                from.month === gregorianCalendarIntroductionDate[1]
+            ) {
+                return max <= gregorianCalendarIntroductionDate[2] || min >= firstGregorianCalendarDay[2]
+                    ? max - min
+                    : max - 10 - min;
+            }
+            return max - min;
         }
 
         return simple
