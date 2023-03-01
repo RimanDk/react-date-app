@@ -1,0 +1,41 @@
+.calculator {
+    margin: 5rem 0;
+    padding: 1rem;
+    background-color: rgb(245 248 250);
+}
+
+.calculator fieldset {
+    border: 0 none;
+    margin-top: 5rem;
+}
+
+.calculator label {
+    display: grid;
+    grid-template-columns: 20% 1fr;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.calculator input {
+    line-height: 2rem;
+    border-radius: 3px;
+}
+
+.calculator .invalid {
+    color: red;
+}
+
+.calculator .invalid input {
+    border: 1px solid red;
+}
+
+.calculator dl {
+    padding: 0;
+    grid-column-start: span 2;
+}
+
+.calculator dd {
+    margin: 0;
+    color: red;
+    font-size: .8rem;
+}

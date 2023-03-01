@@ -1,4 +1,6 @@
+import Calculator from './Calculator'
 import "./App.css";
+
 
 function App() {
   return (
@@ -8,7 +10,7 @@ function App() {
       </header>
       <p>
         Extend this application with functionality that can calculate the difference in days between to dates given by the user.
-        The result should be something that you would think of as production ready. 
+        The result should be something that you would think of as production ready.
       </p>
       <p>
         <b>Example:</b>
@@ -28,6 +30,7 @@ function App() {
         <li>Styling is optional</li>
         <li>Be creative with the solution</li>
       </ul>
+      <Calculator />
     </div>
   );
 }
